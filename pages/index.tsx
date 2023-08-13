@@ -149,7 +149,31 @@ export default function Home() {
                 </tr>
               </tbody>
             </Table>
-            <Box h="100%" w="100%">
+            {/* Table for monthly breakdown of emis, priciple, interest paid and balance */}
+
+            {/* <Table withBorder withColumnBorders>
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>EMI</th>
+                  <th>Principal</th>
+                  <th>Interest</th>
+                  <th>Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(loanTenure * 12)].map((_, i) => (
+                  <tr key={i}>
+                    <td>{i + 1}</td>
+                    <td>{formatRupee(Math.round(emi * 100000))}</td>
+                    <td>{formatRupee(Math.round(emi * 100000))}</td>
+                    <td>{formatRupee(Math.round(emi * 100000))}</td>
+                    <td>{formatRupee(Math.round(emi * 100000))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table> */}
+            {/* <Box h="100%" w="100%">
               <Doughnut
                 data={data}
                 height={400}
@@ -159,7 +183,7 @@ export default function Home() {
                   responsive: false,
                 }}
               />
-            </Box>
+            </Box> */}
           </Stack>
         </Card>
       </main>
