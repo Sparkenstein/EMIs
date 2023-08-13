@@ -122,7 +122,7 @@ export default function Home() {
                 onChange={setRateOfInterest}
                 step={0.25}
                 min={5}
-                max={15}
+                max={30}
                 label={(value) => `${value}%`}
                 labelTransition="slide-up"
                 labelTransitionDuration={150}
