@@ -1,23 +1,34 @@
-import { Card, Stack, Slider, Text, Table, Title, Box } from "@mantine/core";
+import {
+  Card,
+  Stack,
+  Slider,
+  Text,
+  Table,
+  Title,
+  Box,
+  Group,
+} from "@mantine/core";
 import { Inter } from "next/font/google";
 import { useEffect, useState } from "react";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  registerables,
+} from "chart.js";
+import { Doughnut, Bar } from "react-chartjs-2";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
-
-const data = {
-  labels: ["Interest", "Principal"],
-  datasets: [
-    {
-      label: "Total paid",
-      data: [12, 19],
-      backgroundColor: ["rgba(255, 99, 132, 0.5)", "rgba(54, 162, 235, 0.5)"],
-      borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)"],
-      borderWidth: 1,
-    },
-  ],
-};
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  ...registerables
+);
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -47,20 +58,24 @@ export default function Home() {
   useEffect(() => {
     // Calculate EMI
     // P x R x (1+R)^N / [(1+R)^N-1]
-    const r = rateOfInterest / 12 / 100;
-    const n = loanTenure * 12;
-    const p = loanAmount;
+    let emi = calculateEmi(loanAmount, rateOfInterest, loanTenure);
+    setEmi(emi);
+  }, [loanAmount, loanTenure, rateOfInterest]);
+
+  let data = [...Array(30)].map(
+    (_, i) => calculateEmi(loanAmount, rateOfInterest, i + 1) * 100000
+  );
+  console.log("data", data);
+
+  function calculateEmi(_p: number, _r: number, _n: number) {
+    const r = _r / 12 / 100;
+    const n = _n * 12;
+    const p = _p;
     // const emi =
     //   (loanAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
     const emi = p * r * (Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1));
-    // Calculate how much interest is paid
-    // Total paid - principal
-    const interestPaid = emi * n - loanAmount;
-    // Calculate how much principal is paid
-    const principalPaid = loanAmount;
-    console.log({ emi, interestPaid, principalPaid });
-    setEmi(emi);
-  }, [loanAmount, loanTenure, rateOfInterest]);
+    return emi;
+  }
 
   return (
     <>
@@ -115,75 +130,56 @@ export default function Home() {
               />
             </Stack>
 
-            <Table withBorder withColumnBorders>
-              <tbody>
-                <tr>
-                  <td>
-                    <Title>
-                      {MARKS.find((e) => e.value === loanAmount)?.label ||
-                        `${loanAmount / 100}cr`}
-                    </Title>
-                    <Text>Loan Amount</Text>
-                  </td>
-                  <td
-                    style={{
-                      textAlign: "center",
-                    }}
-                    rowSpan={3}
-                  >
-                    <Title>{formatRupee(Math.round(emi * 100000))}</Title>
-                    <Text>EMI</Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Title>{loanTenure} years</Title>
-                    <Text>Loan Tenure</Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Title>{rateOfInterest}%</Title>
-                    <Text>Rate of Interest</Text>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-            {/* Table for monthly breakdown of emis, priciple, interest paid and balance */}
-
-            {/* <Table withBorder withColumnBorders>
-              <thead>
-                <tr>
-                  <th>Month</th>
-                  <th>EMI</th>
-                  <th>Principal</th>
-                  <th>Interest</th>
-                  <th>Balance</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...Array(loanTenure * 12)].map((_, i) => (
-                  <tr key={i}>
-                    <td>{i + 1}</td>
-                    <td>{formatRupee(Math.round(emi * 100000))}</td>
-                    <td>{formatRupee(Math.round(emi * 100000))}</td>
-                    <td>{formatRupee(Math.round(emi * 100000))}</td>
-                    <td>{formatRupee(Math.round(emi * 100000))}</td>
+            <Group noWrap grow>
+              <Table withBorder withColumnBorders>
+                <tbody>
+                  <tr>
+                    <td>
+                      <Title>
+                        {MARKS.find((e) => e.value === loanAmount)?.label ||
+                          `${loanAmount / 100}cr`}
+                      </Title>
+                      <Text>Loan Amount</Text>
+                    </td>
+                    <td
+                      style={{
+                        textAlign: "center",
+                      }}
+                      rowSpan={3}
+                    >
+                      <Title>{formatRupee(Math.round(emi * 100000))}</Title>
+                      <Text>EMI</Text>
+                    </td>
                   </tr>
-                ))}
-              </tbody>
-            </Table> */}
-            {/* <Box h="100%" w="100%">
-              <Doughnut
-                data={data}
-                height={400}
-                width={400}
-                options={{
-                  maintainAspectRatio: false,
-                  responsive: false,
-                }}
-              />
-            </Box> */}
+                  <tr>
+                    <td>
+                      <Title>{loanTenure} years</Title>
+                      <Text>Loan Tenure</Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <Title>{rateOfInterest}%</Title>
+                      <Text>Rate of Interest</Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Card shadow="sm" padding="lg" radius="md">
+                <Title>EMIs in range</Title>
+                <Bar
+                  data={{
+                    labels: [...Array(30)].map((_, i) => i + 1),
+                    datasets: [
+                      {
+                        data: data,
+                        label: "EMI",
+                      },
+                    ],
+                  }}
+                />
+              </Card>
+            </Group>
           </Stack>
         </Card>
       </main>
