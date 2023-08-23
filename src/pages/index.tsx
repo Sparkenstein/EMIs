@@ -21,8 +21,8 @@ import {
   registerables,
 } from "chart.js";
 import { Doughnut, Bar } from "react-chartjs-2";
-import { EmiCard } from "./components/EMI";
-import { DurationCard } from "./components/Duration";
+import { EmiCard } from "../components/EMI";
+import { DurationCard } from "../components/Duration";
 
 ChartJS.register(
   ArcElement,
